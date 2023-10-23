@@ -13,6 +13,7 @@ import java.io.*;
 			ServerSocket ss = new ServerSocket(1234);
 			System.out.println("je suis un serveur,j'attends une connexion");
 			while (true) {
+				// serveur bloquant en attente de communication 
 		    Socket s=ss.accept();
 			new ClientProcess(s,ord++).start();
 			System.out.println("vous etes connecté_bienvenue");
