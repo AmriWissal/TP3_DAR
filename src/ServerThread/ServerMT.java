@@ -1,6 +1,7 @@
 package ServerThread;
 import java.net.*;
 import java.io.*;
+import OperationPAK.Operation;
       public class ServerMT extends Thread{
 		int ord ;
       public static void main(String[] args) {
@@ -34,10 +35,36 @@ import java.io.*;
 			}
 			public void run() {
 				try {
-					PrintWriter pw = new PrintWriter(s.getOutputStream(), true);
-					pw.println("Client numéro "+ord+" Votre address IP :"+s.getRemoteSocketAddress());
+					// Flux de comminication et de traitement :
+					InputStream is = s.getInputStream();
+					OutputStream os = s.getOutputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+					ObjectOutputStream oos = new ObjectOutputStream(os);
+						//PrintWriter pw = new PrintWriter(s.getOutputStream(), true);
+						//pw.println("Client numéro "+ord+" Votre address IP :"+s.getRemoteSocketAddress());
+					// Opération:
+					Operation op=(Operation)(new ObjectInputStream(s.getInputStream()).readObject());
+					switch(op.getOperation()) {
+					case'+': 
+						op.setResult(op.getOp1()+op.getOp2());
+						break;
+					case '-':
+						op.setResult(op.getOp1()-op.getOp2());
+						break;
+					case '*':
+						op.setResult(op.getOp1()*op.getOp2());
+						break;
+					case '/':
+						op.setResult(op.getOp1()/op.getOp2());
+						break;
+					default:
+						break;
+					}
+					// Envoie d'objet
+					oos.writeObject(op);
+					//Fermeture de la connexion :
 					s.close();
-				} catch (IOException e) {
+				} catch (IOException | ClassNotFoundException e) {
 					e.printStackTrace();
 				}
 			}
